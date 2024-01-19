@@ -3,7 +3,7 @@ from datetime import datetime
 
 from bson import ObjectId
 from pydantic import BaseModel, Field, validator
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 
 class Movie(BaseModel):
@@ -16,7 +16,7 @@ class Movie(BaseModel):
     title: Optional[str] = None
     fullplot: Optional[str] = None
     languages: Optional[List[str]] = None
-    released: Optional[str] = None
+    released: Optional[Union[str, datetime]] = None
     directors: Optional[List[str]] = None
     writers: Optional[List[str]] = None
     rated: Optional[str] = None
@@ -40,6 +40,12 @@ class Movie(BaseModel):
             # Format the datetime as a string (adjust the format as needed)
             return v.strftime("%Y-%m-%d")
         return v
+    
+    @validator("released", pre=True, allow_reuse=True)
+    def parse_iso_date(cls, value):
+        if isinstance(value, str):
+            return datetime.fromisoformat(value)
+        return value
 
     class Config:
         json_schema_extra = {
@@ -79,25 +85,36 @@ class Movie(BaseModel):
 
 
 class MovieUpdate(BaseModel):
-    plot: Optional[str]
-    genres: Optional[List[str]]
-    runtime: Optional[int]
-    cast: Optional[List[str]]
-    poster: Optional[str]
-    title: Optional[str]
-    fullplot: Optional[str]
-    languages: Optional[List[str]]
-    released: Optional[int]
-    directors: Optional[List[str]]
-    rated: Optional[str]
-    awards: Optional[dict]
-    lastupdated: Optional[str]
-    year: Optional[int]
-    imdb: Optional[dict]
-    countries: Optional[List[str]]
+    plot: Optional[str] = None
+    genres: Optional[List[str]] = None
+    runtime: Optional[int] = None
+    cast : Optional[List[str]] = None
+    poster: Optional[str] = None
+    title: Optional[str] = None
+    fullplot: Optional[str] = None
+    languages: Optional[List[str]] = None
+    released: Optional[Union[str, datetime]] = None
+    directors: Optional[List[str]] = None
+    writers: Optional[List[str]] = None
+    rated: Optional[str] = None
+    awards: Optional[Dict] = None
+    lastupdated: Optional[str] = None
+    year: Optional[int] = None
+    imdb: Optional[Dict] = None
+    countries: Optional[List[str]] = None
+    type: Optional[str] = None
+    tomatoes: Optional[Dict] = None
+    num_mflix_comments: Optional[int] = None
+    
     type: Optional[str]
     tomatoes: Optional[dict]
     num_mflix_comments: Optional[int]
+    
+    @validator("released", pre=True, allow_reuse=True)
+    def parse_iso_date(cls, value):
+        if isinstance(value, str):
+            return datetime.fromisoformat(value)
+        return value
 
     class Config:
         json_schema_extra = {
