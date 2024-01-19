@@ -8,10 +8,6 @@ config = dotenv_values(".env")
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    return {"message: Hello world !"}
-
 
 @app.on_event("startup")
 def startup_db_client():
