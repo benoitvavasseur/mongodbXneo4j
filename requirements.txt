@@ -1,0 +1,6 @@
+fastapi[all]
+pymongo[srv]
+python-dotenv
+neo4j
+py2neo
+neomodel
