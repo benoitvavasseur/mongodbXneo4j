@@ -1,31 +1,45 @@
 import uuid
-from typing import Optional
-from pydantic import BaseModel, Field
-from typing import List
+from datetime import datetime
+
+from bson import ObjectId
+from pydantic import BaseModel, Field, validator
+from typing import List, Dict, Optional
 
 
 class Movie(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    plot: str = Field(...)
-    genres: List[str] = Field(...)
-    runtime: int = Field(...)
-    cast: List[str] = Field(...)
-    poster: str = Field(...)
-    title: str = Field(...)
-    fullplot: str = Field(...)
-    languages: List[str] = Field(...)
-    released: str = Field(...)
-    directors: List[str] = Field(...)
-    writers: List[str] = Field(...)
-    rated: str = Field(...)
-    awards: dict = Field(...)
-    lastupdated: str = Field(...)
-    year: int = Field(...)
-    imdb: dict = Field(...)
-    countries: List[str] = Field(...)
-    type: str = Field(...)
-    tomatoes: dict = Field(...)
-    num_mflix_comments: int = Field(...)
+    plot: Optional[str] = None
+    genres: Optional[List[str]] = None
+    runtime: Optional[int] = None
+    cast : Optional[List[str]] = None
+    poster: Optional[str] = None
+    title: Optional[str] = None
+    fullplot: Optional[str] = None
+    languages: Optional[List[str]] = None
+    released: Optional[str] = None
+    directors: Optional[List[str]] = None
+    writers: Optional[List[str]] = None
+    rated: Optional[str] = None
+    awards: Optional[Dict] = None
+    lastupdated: Optional[str] = None
+    year: Optional[int] = None
+    imdb: Optional[Dict] = None
+    countries: Optional[List[str]] = None
+    type: Optional[str] = None
+    tomatoes: Optional[Dict] = None
+    num_mflix_comments: Optional[int] = None
+
+    @validator('id', pre=True)
+    def convert_objectid_to_string(cls, v):
+        if isinstance(v, ObjectId):
+            return str(v)
+        return v
+    @validator('released', pre=True)
+    def format_date(cls, v):
+        if isinstance(v, datetime):
+            # Format the datetime as a string (adjust the format as needed)
+            return v.strftime("%Y-%m-%d")
+        return v
 
     class Config:
         json_schema_extra = {
