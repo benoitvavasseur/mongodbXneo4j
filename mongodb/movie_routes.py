@@ -30,7 +30,7 @@ def create_movie(request: Request, movie: Movie = Body(...)):
         {"_id": new_movie.inserted_id}
     )
 
-    return create_movie
+    return created_movie
 
 @router.put("/{id}", response_description="Update a movie", response_model=Movie)
 def update_movie(id: str, request: Request, movie: MovieUpdate = Body(...)):
@@ -45,7 +45,7 @@ def update_movie(id: str, request: Request, movie: MovieUpdate = Body(...)):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Movie with ID {id} not found")
 
     if (
-        existing_movie := request.app.database["movies"].find_one({"_id": id})
+        existing_movie := request.app.database["movies"].find_one({"_id": oid})
     ) is not None:
         return existing_movie
 
