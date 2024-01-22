@@ -1,3 +1,15 @@
+"""
+@file models
+@brief Contains the definition of data models for the FastAPI application.
+
+This module defines Pydantic data models representing users, movies, and movie updates.
+These models are used for request and response validation, and they include validators and
+configuration settings.
+
+@attention
+To use these models effectively, it's essential to ensure that the Pydantic library is installed.
+Install it using the following command: pip install pydantic
+"""
 import uuid
 from datetime import datetime
 
@@ -5,10 +17,54 @@ from bson import ObjectId
 from pydantic import BaseModel, Field, validator
 from typing import List, Dict, Optional, Union
 
+"""
+@class User
+@brief Represents a user in the application.
 
+@field p: An optional dictionary representing user properties.
+
+@config json_schema_extra: Additional JSON schema information for documentation and example purposes.
+"""
 class User(BaseModel):
     p: Optional[Dict[str, str]]
+    
+    class Config:
+        json_schema_extra = {
+            "name": "Jessica Thompson"
+        }
 
+"""
+@class Movie
+@brief Represents a movie in the MongoDB movies database.
+
+@field id: A string field representing the unique identifier of the movie, defaulting to a new UUID4.
+@field plot: An optional string field representing the movie's plot.
+@field genres: An optional list of strings representing the movie's genres.
+@field runtime: An optional integer field representing the movie's runtime in minutes.
+@field cast: An optional list of strings representing the movie's cast.
+@field poster: An optional string field representing the URL of the movie's poster.
+@field title: An optional string field representing the movie's title.
+@field fullplot: An optional string field representing the full plot description of the movie.
+@field languages: An optional list of strings representing the languages in which the movie is available.
+@field released: An optional field representing the release date of the movie, either as a string or a datetime object.
+@field directors: An optional list of strings representing the movie's directors.
+@field writers: An optional list of strings representing the movie's writers.
+@field rated: An optional string field representing the movie's rating.
+@field awards: An optional dictionary representing the movie's awards.
+@field lastupdated: An optional string field representing the last update timestamp of the movie.
+@field year: An optional integer field representing the movie's release year.
+@field imdb: An optional dictionary representing IMDb-related information for the movie.
+@field countries: An optional list of strings representing the countries where the movie was produced.
+@field type: An optional string field representing the type of the movie.
+@field tomatoes: An optional dictionary representing Rotten Tomatoes-related information for the movie.
+@field num_mflix_comments: An optional integer field representing the number of comments for the movie.
+
+@validator convert_objectid_to_string: A pre-validation method that converts the 'id' field from ObjectId to string.
+@validator format_date: A pre-validation method that formats the 'released' field as a string.
+@validator parse_iso_date: A pre-validation method that parses the 'released' field from ISO format to datetime.
+
+@config json_schema_extra: Additional JSON schema information for documentation and example purposes.
+"""
 class Movie(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     plot: Optional[str] = None
@@ -86,7 +142,35 @@ class Movie(BaseModel):
             }
         }
 
+"""
+@class MovieUpdate
+@brief Represents the data model for updating movie information.
 
+@field plot: An optional string field representing the updated movie plot.
+@field genres: An optional list of strings representing the updated movie genres.
+@field runtime: An optional integer field representing the updated movie runtime in minutes.
+@field cast: An optional list of strings representing the updated movie cast.
+@field poster: An optional string field representing the URL of the updated movie poster.
+@field title: An optional string field representing the updated movie title.
+@field fullplot: An optional string field representing the updated full plot description of the movie.
+@field languages: An optional list of strings representing the updated languages in which the movie is available.
+@field released: An optional field representing the updated release date of the movie, either as a string or a datetime object.
+@field directors: An optional list of strings representing the updated movie directors.
+@field writers: An optional list of strings representing the updated movie writers.
+@field rated: An optional string field representing the updated movie rating.
+@field awards: An optional dictionary representing the updated movie awards.
+@field lastupdated: An optional string field representing the last update timestamp of the movie.
+@field year: An optional integer field representing the updated movie release year.
+@field imdb: An optional dictionary representing IMDb-related information for the updated movie.
+@field countries: An optional list of strings representing the updated countries where the movie was produced.
+@field type: An optional string field representing the updated type of the movie.
+@field tomatoes: An optional dictionary representing Rotten Tomatoes-related information for the updated movie.
+@field num_mflix_comments: An optional integer field representing the updated number of comments for the movie.
+
+@validator parse_iso_date: A pre-validation method that parses the 'released' field from ISO format to datetime.
+
+@config json_schema_extra: Additional JSON schema information for documentation and example purposes.
+"""
 class MovieUpdate(BaseModel):
     plot: Optional[str] = None
     genres: Optional[List[str]] = None
