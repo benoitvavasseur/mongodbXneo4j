@@ -6,6 +6,9 @@ from pydantic import BaseModel, Field, validator
 from typing import List, Dict, Optional, Union
 
 
+class User(BaseModel):
+    p: Optional[Dict[str, str]]
+
 class Movie(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     plot: Optional[str] = None
