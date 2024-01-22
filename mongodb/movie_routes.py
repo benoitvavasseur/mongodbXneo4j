@@ -7,7 +7,7 @@ from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 
-from models import Movie, MovieUpdate
+from models import Movie, MovieUpdate, User, MoviesNeo4j
 
 router = APIRouter()
 
@@ -49,3 +49,20 @@ def update_movie_by_title(request: Request, title: str, movie: MovieUpdate = Bod
         return updated_movie
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Movie with title '{title}' not found")
+
+
+@router.get("/users_rated_movie/", response_description="List all users who rated a movie", response_model=List[User])
+def users_rated_movie(request: Request, title: str):
+    users = request.app.neo4j_driver.session().run(
+        "MATCH (p:Person)-[:REVIEWED]->(:Movie {title: $title}) RETURN p", title=title
+    )
+
+    return users
+
+@router.get("/movies_rated_by_user/", response_description="List all movies rated by a user")
+def movies_rated_by_user(request: Request, name: str):
+    movies = request.app.neo4j_driver.session().run(
+        "MATCH (:Person {name:$name}) - [:REVIEWED] -> (m:Movie) RETURN COUNT(m), COLLECT(m) ", name=name
+    )
+    data = movies.single()
+    return{"user": name, "count": data[0], "movies": data[1]}
