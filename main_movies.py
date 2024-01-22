@@ -18,13 +18,14 @@ def startup_db_client():
 
     # Neo4j driver
     app.neo4j_driver = GraphDatabase.driver(
-        "bolt://35.171.16.234:7687",
-        auth=("neo4j", "foreground-highway-coat")
+        config["NEO4J_URI"],
+        auth=(config["NEO4J_USERNAME"], config["NEO4J_PASSWORD"]),
     )
 
 
 @app.on_event("shutdown")
 def shutdown_db_client():
     app.mongodb_client.close()
+    app.neo4j_driver.close()
 
 app.include_router(movie_router, tags=["movies"], prefix="/movies")
