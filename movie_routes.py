@@ -7,7 +7,7 @@ from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 
-from models import Movie, MovieUpdate, User, MoviesNeo4j
+from models import Movie, MovieUpdate, User
 
 router = APIRouter()
 
@@ -50,6 +50,22 @@ def update_movie_by_title(request: Request, title: str, movie: MovieUpdate = Bod
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Movie with title '{title}' not found")
 
+@router.get("/common_movies_count", response_description="Count of movies common between MongoDB and Neo4j")
+def common_movies_count(request: Request):
+    mongodb_movies = request.app.database["movies"].find({}, {"title": 1})
+    mongodb_titles = {movie["title"] for movie in mongodb_movies}
+
+    with request.app.neo4j_driver.session() as session:
+        query = """
+        MATCH (m:Movie)
+        WHERE m.title IN $titles
+        RETURN m.title
+        """
+        result = session.run(query, titles=list(mongodb_titles))
+        neo4j_titles = {record["m.title"] for record in result}
+
+    common_movies = mongodb_titles.intersection(neo4j_titles)
+    return {"common_movies_count": len(common_movies), "m.title": list(common_movies)}
 
 @router.get("/users_rated_movie/", response_description="List all users who rated a movie", response_model=List[User])
 def users_rated_movie(request: Request, title: str):
